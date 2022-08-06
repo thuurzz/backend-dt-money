@@ -8,9 +8,6 @@ export type TransactionDocument = Transaction & Document;
 @Schema()
 export class Transaction {
   @Prop()
-  id: number;
-
-  @Prop()
   title: string;
 
   @Prop()

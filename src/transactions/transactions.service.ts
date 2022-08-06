@@ -1,26 +1,52 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import {
+  Transaction,
+  TransactionDocument,
+} from './entities/transaction.entity';
 
 @Injectable()
 export class TransactionsService {
+  constructor(
+    @InjectModel(Transaction.name)
+    private transactionModel: Model<TransactionDocument>,
+  ) {}
+
   create(createTransactionDto: CreateTransactionDto) {
-    return 'This action adds a new transaction';
+    const transaction = new this.transactionModel(createTransactionDto);
+    return transaction.save();
   }
 
   findAll() {
-    return `This action returns all transactions`;
+    return this.transactionModel.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} transaction`;
+  findOne(id: string) {
+    return this.transactionModel.findById(id);
   }
 
-  update(id: number, updateTransactionDto: UpdateTransactionDto) {
-    return `This action updates a #${id} transaction`;
+  update(id: string, updateTransactionDto: UpdateTransactionDto) {
+    return this.transactionModel.findByIdAndUpdate(
+      {
+        _id: id,
+      },
+      {
+        $set: updateTransactionDto,
+      },
+      {
+        new: true,
+      },
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} transaction`;
+  remove(id: string) {
+    return this.transactionModel
+      .deleteOne({
+        _id: id,
+      })
+      .exec();
   }
 }
